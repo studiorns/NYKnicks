@@ -1,0 +1,2210 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NY Knicks Sponsorship Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* SONER Logo Animation */
+        @keyframes sonerScan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes sonerBlip { 0%, 20%, 100% { opacity: 0; } 2%, 15% { opacity: 1; } 3% { transform: scale(1.2); } }
+        
+        /* SONER Logo styles */
+        .soner-logo { display: flex; align-items: center; color: white; font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 300; }
+        .soner-radar { width: 24px; height: 24px; border-radius: 50%; border: 1px solid white; margin: 0 3px; position: relative; background-color: rgba(255, 255, 255, 0.05); overflow: hidden; }
+        .soner-scanner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; animation: sonerScan 4s linear infinite; transform-origin: center; }
+        .soner-scanner::before { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 50%; background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4)); transform-origin: bottom left; clip-path: polygon(0 0, 100% 0, 0 100%); }
+        .soner-scanner::after { content: ''; position: absolute; top: 0; left: 50%; width: 50%; height: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 1)); transform-origin: left center; box-shadow: 0 0 4px rgba(255, 255, 255, 0.8); }
+        .soner-blip { position: absolute; width: 2px; height: 2px; background-color: white; border-radius: 50%; opacity: 0; box-shadow: 0 0 4px white; }
+        .soner-blip:nth-child(1) { top: 25%; left: 30%; animation: sonerBlip 4s 1s infinite; }
+        .soner-blip:nth-child(2) { top: 65%; left: 60%; animation: sonerBlip 4s 2.5s infinite; }
+        .soner-tagline { color: white; font-size: 8px; text-transform: uppercase; font-weight: 500; letter-spacing: 0.5em; margin-left: 10px; opacity: 0.8; }
+        
+        :root {
+            --primary: #F58426; /* Knicks orange */
+            --primary-light: #332111; /* Dark orange for backgrounds */
+            --primary-dark: #F7A05B; /* Light orange for text */
+            --secondary: #006BB6; /* Knicks blue */
+            --secondary-light: #0A1A2A; /* Dark blue for backgrounds */
+            --secondary-dark: #4A99D4; /* Light blue for text */
+            --warning: #fbbc04;
+            --warning-light: #332a1a;
+            --danger: #ea4335;
+            --danger-light: #331f1e;
+            --gray-100: #1e1e1e;
+            --gray-200: #2d2d2d;
+            --gray-300: #3d3d3d;
+            --gray-400: #4d4d4d;
+            --gray-500: #777777;
+            --gray-600: #a0a0a0;
+            --gray-700: #c0c0c0;
+            --gray-800: #e0e0e0;
+            --gray-900: #f0f0f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 15px 25px rgba(0, 0, 0, 0.6);
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
+            --bg-color: #000000;
+            --card-bg: #121212;
+            --section-bg: #181818;
+            --fans-color: #F58426; /* Knicks orange for fans */
+            --non-fans-color: #006BB6; /* Knicks blue for non-fans */
+            --diff-positive: #4CAF50; /* Green for positive differences */
+            --diff-negative: #F44336; /* Red for negative differences */
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--gray-800);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        header {
+            background: #1a73e8;
+            color: white;
+            padding: 32px 0;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQ0MCIgaGVpZ2h0PSI0MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IHgxPSIxMDAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiIGlkPSJhIj48c3RvcCBzdG9wLWNvbG9yPSIjRkZGIiBzdG9wLW9wYWNpdHk9Ii4wNSIgb2Zmc2V0PSIwJSIvPjxzdG9wIHN0b3AtY29sb3I9IiNGRkYiIHN0b3Atb3BhY2l0eT0iLjAyIiBvZmZzZXQ9IjEwMCUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNMTQ0MCAyMDBjLTEzMS44LTEyLjktMjY3LjgtMTkuNC00MDgtMTkuNC0xNDAuMiAwLTI3Ni4yIDYuNS00MDggMTkuNFYwaDgxNnYyMDB6IiBmaWxsPSJ1cmwoI2EpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 40px;
+        }
+        
+        .logo {
+            height: 80px;
+            object-fit: contain;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--gray-900);
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+        }
+        
+        h4 {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .dashboard-section {
+            background-color: var(--section-bg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 32px;
+            transition: var(--transition);
+            border: 1px solid var(--gray-300);
+        }
+        
+        .dashboard-section:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-section h2 {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: 16px;
+            margin-bottom: 28px;
+            color: var(--gray-900);
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-section h2 i {
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 1.25rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        
+        .metric-card {
+            background-color: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+        
+        .metric-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .metric-name i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+        
+        .change {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .change i {
+            margin-right: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .positive { 
+            background-color: var(--secondary-light); 
+            color: var(--secondary-dark);
+        }
+        
+        .negative { 
+            background-color: var(--danger-light); 
+            color: var(--danger);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            margin-bottom: 28px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--gray-300);
+            transition: var(--transition);
+        }
+        
+        .chart-container:hover {
+            box-shadow: var(--shadow-md);
+        }
+        
+        .tab-container {
+            margin-top: 24px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid var(--gray-300);
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-radius: var(--radius) var(--radius) 0 0;
+            transition: var(--transition);
+            position: relative;
+            font-size: 0.95rem;
+        }
+        
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+        
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn.active::after {
+            transform: scaleX(1);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 8px 0 24px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .insight-summary {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+        }
+        
+        .insight-summary::before {
+            content: '\f0eb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 1.5rem;
+            color: var(--primary);
+            opacity: 0.2;
+        }
+        
+        .insight-summary h3 {
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .insight-summary h3 i {
+            margin-right: 10px;
+        }
+        
+        .insight-summary p {
+            margin: 0;
+            color: var(--gray-800);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        .highlight-box {
+            background-color: var(--secondary-light);
+            border-left: 4px solid var(--secondary);
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+        }
+        
+        .highlight-box::before {
+            content: '\f071';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 1.5rem;
+            color: var(--secondary);
+            opacity: 0.2;
+        }
+        
+        .highlight-box h5 {
+            color: var(--secondary-dark);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .highlight-box h5 i {
+            margin-right: 10px;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+            margin: 28px 0;
+        }
+        
+        .supporting-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }
+        
+        .data-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-300);
+            transition: var(--transition);
+        }
+        
+        .data-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .data-card h4 {
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+        }
+        
+        .data-card h4 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .data-card ul {
+            padding-left: 18px;
+            margin-bottom: 0;
+        }
+        
+        .data-card li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .data-card li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .recommendation-card {
+            background-color: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recommendation-card::after {
+            content: '\f0eb';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: 0.05;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .recommendation-card h4 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recommendation-card h4 i {
+            margin-right: 10px;
+        }
+        
+        .recommendation-card p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        
+        .recommendation-card p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(245, 132, 38, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+        
+        .print-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(245, 132, 38, 0.5);
+        }
+        
+        
+        /* New styles for fan vs non-fan comparison */
+        .segment-legend {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 24px;
+        }
+        
+        .segment-legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .segment-legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        
+        .fans-color {
+            background-color: rgba(245, 132, 38, 0.8);
+        }
+        
+        .non-fans-color {
+            background-color: rgba(0, 107, 182, 0.8);
+        }
+        
+        .diff-color {
+            background-color: rgba(76, 175, 80, 0.8);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        
+        .comparison-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-300);
+            transition: var(--transition);
+        }
+        
+        .comparison-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .comparison-card h4 {
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+        }
+        
+        .comparison-card h4 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        .comparison-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .comparison-label {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        
+        .comparison-values {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .comparison-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .fans-value {
+            color: var(--fans-color);
+        }
+        
+        .non-fans-value {
+            color: var(--non-fans-color);
+        }
+        
+        .comparison-diff {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        
+        .diff-positive {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--diff-positive);
+        }
+        
+        .diff-negative {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--diff-negative);
+        }
+        
+        .segment-strategy-card {
+            background-color: var(--gray-100);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fans-strategy-card {
+            border-left: 4px solid var(--fans-color);
+        }
+        
+        .non-fans-strategy-card {
+            border-left: 4px solid var(--non-fans-color);
+        }
+        
+        .segment-strategy-card h4 {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .fans-strategy-card h4 {
+            color: var(--fans-color);
+        }
+        
+        .non-fans-strategy-card h4 {
+            color: var(--non-fans-color);
+        }
+        
+        .segment-strategy-card h4 i {
+            margin-right: 10px;
+        }
+        
+        .segment-strategy-card ul {
+            padding-left: 18px;
+            margin-bottom: 0;
+        }
+        
+        .segment-strategy-card li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .segment-strategy-card li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .segment-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+        
+        .segment-filter-btn {
+            padding: 8px 16px;
+            background-color: var(--gray-200);
+            border: none;
+            border-radius: var(--radius);
+            color: var(--gray-700);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .segment-filter-btn:hover {
+            background-color: var(--gray-300);
+        }
+        
+        .segment-filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Engagement Journey Styles */
+        .engagement-journey-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 40px 0;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-300);
+            overflow-x: auto;
+            gap: 10px;
+        }
+        
+        .engagement-journey-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 100px;
+            padding: 15px 10px;
+            border-radius: var(--radius);
+            background-color: var(--gray-100);
+            transition: var(--transition);
+        }
+        
+        .engagement-journey-step:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .engagement-journey-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        
+        .engagement-journey-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            margin-bottom: 5px;
+        }
+        
+        .engagement-journey-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .engagement-journey-arrow {
+            color: var(--gray-500);
+            font-size: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-grid, .data-grid, .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .supporting-metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: left;
+                padding: 12px;
+                border-radius: 0;
+            }
+            
+            .print-btn {
+                bottom: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+                right: 20px;
+            }
+            
+            .data-card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .data-card ul {
+                padding-left: 16px;
+            }
+            
+            .data-card li {
+                font-size: 0.95rem;
+                line-height: 1.4;
+                margin-bottom: 8px;
+            }
+            
+            .container {
+                padding: 0 16px;
+            }
+            
+            .dashboard-section {
+                padding: 20px;
+                margin-bottom: 24px;
+            }
+            
+            .chart-container {
+                height: 350px;
+                padding: 16px;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .logo {
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .data-card h4 {
+                font-size: 1rem;
+            }
+            
+            .data-card li {
+                font-size: 0.9rem;
+            }
+            
+            .dashboard-section h2 {
+                font-size: 1.3rem;
+            }
+            
+            .metric-value {
+                font-size: 1.6rem;
+            }
+            
+            .chart-container {
+                height: 300px;
+                padding: 12px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .dashboard-section {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+            
+            .print-btn {
+                display: none;
+            }
+            
+            .tab-content {
+                display: block !important;
+            }
+            
+            .tab-buttons {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 15px;">
+                <div class="soner-logo">
+                    S<div class="soner-radar">
+                        <div class="soner-scanner"></div>
+                        <div class="soner-blip"></div>
+                        <div class="soner-blip"></div>
+                    </div>NER
+                    <span class="soner-tagline">Visual Intelligence</span>
+                </div>
+            </div>
+            <h1>NY Knicks Sponsorship Dashboard</h1>
+            <h2 style="font-size: 1.3rem; margin-top: 5px; font-weight: 500;">Department of Culture and Tourism - Abu Dhabi</h2>
+            <p>Sponsorship Impact Analysis 2024-2025</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="dashboard-section">
+            <h2><i class="fas fa-chart-line"></i> Key Sponsorship Metrics (Pre vs Post)</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-name"><i class="fas fa-eye"></i> Overall Knicks Sponsorship Awareness</div>
+                    <div class="metric-value">82% <span class="change positive"><i class="fas fa-arrow-up"></i> +8pp</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-name"><i class="fas fa-bullseye"></i> Spontaneous Abu Dhabi Awareness</div>
+                    <div class="metric-value">22% <span class="change positive"><i class="fas fa-arrow-up"></i> +22pp</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-name"><i class="fas fa-globe"></i> Total Abu Dhabi Awareness</div>
+                    <div class="metric-value">46% <span class="change positive"><i class="fas fa-arrow-up"></i> +42pp</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-name"><i class="fas fa-map-marker-alt"></i> Destination Awareness (Knicks Fans)</div>
+                    <div class="metric-value">61% <span class="change positive"><i class="fas fa-arrow-up"></i> +3pp</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- New Fans vs. Non-Fans Comparison Section -->
+        <div class="dashboard-section">
+            <h2><i class="fas fa-users"></i> Fans vs. Non-Fans Comparison</h2>
+            
+            <div class="segment-legend">
+                <div class="segment-legend-item">
+                    <div class="segment-legend-color fans-color"></div>
+                    <span>NY Knicks Fans</span>
+                </div>
+                <div class="segment-legend-item">
+                    <div class="segment-legend-color non-fans-color"></div>
+                    <span>Non-Fans</span>
+                </div>
+                <div class="segment-legend-item">
+                    <div class="segment-legend-color diff-color"></div>
+                    <span>Difference</span>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="awareness-comparison-chart"></canvas>
+            </div>
+            
+            <div class="insight-summary">
+                <h3><i class="fas fa-lightbulb"></i> Key Segment Insight</h3>
+                <p>Knicks fans consistently show higher awareness and engagement metrics compared to non-fans, with the most significant differences in advertising awareness (+14pp) and spontaneous destination awareness (+9pp). This indicates that the sponsorship has been particularly effective at reaching the fan base, while non-fans represent an opportunity for growth.</p>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h4><i class="fas fa-eye"></i> Awareness Metrics</h4>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Overall Destination Awareness</div>
+                        <div class="comparison-values">
+                            <div class="comparison-value fans-value">61%</div>
+                            <div class="comparison-value non-fans-value">52%</div>
+                            <div class="comparison-diff diff-positive">+9pp</div>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Spontaneous Awareness (MENA)</div>
+                        <div class="comparison-values">
+                            <div class="comparison-value fans-value">13%</div>
+                            <div class="comparison-value non-fans-value">4%</div>
+                            <div class="comparison-diff diff-positive">+9pp</div>
+                        </div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="comparison-label">Overall Advertising Awareness</div>
+                        <div class="comparison-values">
+                            <div class="comparison-value fans-value">44%</div>
+                            <div class="comparison-value non-fans-value">30%</div>
+                            <div class="comparison-diff diff-positive">+14pp</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="data-card">
+                    <h4><i class="fas fa-tv"></i> Viewing Patterns (Post-Sponsorship)</h4>
+                    <ul>
+                        <li><strong>Watch Regardless of Teams</strong>: 37% of Knicks fans</li>
+                        <li><strong>Daily Viewers</strong>: 16% of Knicks fans</li>
+                        <li><strong>4-5 Times Weekly</strong>: 30% of Knicks fans</li>
+                        <li><strong>2-3 Times Weekly</strong>: 38% of Knicks fans</li>
+                        <li><strong>In-Stadium Viewing</strong>: 41% of Knicks fans</li>
+                    </ul>
+                </div>
+                
+                <div class="data-card">
+                    <h4><i class="fas fa-map-marker-alt"></i> Viewing Locations (Post-Sponsorship)</h4>
+                    <ul>
+                        <li><strong>TV at Home/Friend's Place</strong>: 87% of Knicks fans</li>
+                        <li><strong>Sports Bar/Cafe</strong>: 51% of Knicks fans</li>
+                        <li><strong>In-Stadium (Live)</strong>: 41% of Knicks fans</li>
+                        <li><strong>Mobile/Laptop/Tablet</strong>: 41% of Knicks fans</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="viewing-radar-chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2><i class="fas fa-bullhorn"></i> Engagement Channels</h2>
+            <div class="chart-container">
+                <canvas id="channels-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Engagement with Abu Dhabi Section -->
+        <div class="dashboard-section">
+            <h2><i class="fas fa-handshake"></i> Engagement with Abu Dhabi/EAD after learning about the sponsorship</h2>
+            
+            <div class="insight-summary">
+                <h3><i class="fas fa-lightbulb"></i> Engagement Insight</h3>
+                <p>After becoming aware of the Abu Dhabi sponsorship, fans engaged with the destination in various ways. Digital interactions through Google (62%) and social media (51%) were most common, while website visits (32%) and word-of-mouth (13%) represent opportunities for growth in future campaigns.</p>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="engagement-journey-chart"></canvas>
+            </div>
+            
+            <div class="data-grid">
+                <div class="data-card">
+                    <h4><i class="fas fa-search"></i> Digital Discovery</h4>
+                    <ul>
+                        <li><strong>Googled Abu Dhabi</strong>: 62% of aware fans searched for more information</li>
+                        <li><strong>Browsed Social Media</strong>: 51% engaged with Abu Dhabi content on social platforms</li>
+                        <li><strong>Opportunity</strong>: Optimize search presence and create more shareable social content</li>
+                    </ul>
+                </div>
+                
+                <div class="data-card">
+                    <h4><i class="fas fa-globe"></i> Conversion Touchpoints</h4>
+                    <ul>
+                        <li><strong>Website Visits</strong>: 32% visited the Experience Abu Dhabi website</li>
+                        <li><strong>Word-of-Mouth</strong>: 13% discussed Abu Dhabi with friends and family</li>
+                        <li><strong>Opportunity</strong>: Enhance website UX and create shareable experiences to boost advocacy</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="engagement-journey-container" style="justify-content: space-around; gap: 20px;">
+                <div class="engagement-journey-step">
+                    <div class="engagement-journey-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="engagement-journey-label">Googled Abu Dhabi</div>
+                    <div class="engagement-journey-value">62%</div>
+                </div>
+                
+                <div class="engagement-journey-step">
+                    <div class="engagement-journey-icon">
+                        <i class="fas fa-hashtag"></i>
+                    </div>
+                    <div class="engagement-journey-label">Browsed Social Media</div>
+                    <div class="engagement-journey-value">51%</div>
+                </div>
+                
+                <div class="engagement-journey-step">
+                    <div class="engagement-journey-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="engagement-journey-label">Visited Website</div>
+                    <div class="engagement-journey-value">32%</div>
+                </div>
+                
+                <div class="engagement-journey-step">
+                    <div class="engagement-journey-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="engagement-journey-label">Word-of-Mouth</div>
+                    <div class="engagement-journey-value">13%</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h5><i class="fas fa-bullseye"></i> Engagement Optimization Strategy</h5>
+                <p>To maximize the impact of the sponsorship, focus on strengthening each engagement touchpoint: enhance search visibility to capture the 62% who Google Abu Dhabi, create compelling social content for the 51% browsing on social media, improve website conversion for the 32% who visit, and develop shareable experiences to boost the 13% word-of-mouth rate.</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2><i class="fas fa-chart-bar"></i> Pre vs Post Comparison</h2>
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="awareness">Awareness Metrics</button>
+                    <button class="tab-btn" data-tab="advertising">Advertising Awareness</button>
+                    <button class="tab-btn" data-tab="engagement">Post-Awareness Engagement</button>
+                </div>
+                
+                <div class="tab-content active" id="awareness-tab">
+                    <div class="chart-container">
+                        <canvas id="awareness-chart"></canvas>
+                    </div>
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-lightbulb"></i> Key Insight</h3>
+                        <p>The sponsorship has significantly increased Abu Dhabi's visibility among NY Knicks fans, with spontaneous awareness rising from 0% to 22% and total awareness increasing from 4% to 46% among those aware of Knicks sponsorships.</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="advertising-tab">
+                    <div class="chart-container">
+                        <canvas id="advertising-chart"></canvas>
+                    </div>
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-lightbulb"></i> Key Insight</h3>
+                        <p>Advertising awareness among Knicks fans increased from 37% to 44%, with spontaneous advertising awareness among MENA destinations increasing from 2% to 8%, indicating stronger brand recall.</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="engagement-tab">
+                    <div class="chart-container">
+                        <canvas id="engagement-chart"></canvas>
+                    </div>
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-lightbulb"></i> Key Insight</h3>
+                        <p>Digital engagement is the primary way fans interact with Abu Dhabi content after exposure. Googling (62%) and social media browsing (51%) are the dominant actions, while website visits (32%) and word-of-mouth (13%) represent opportunities for growth through targeted conversion strategies.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2><i class="fas fa-chart-pie"></i> Channel Effectiveness</h2>
+            <div class="data-grid">
+                <div class="data-card">
+                    <h4><i class="fas fa-star"></i> Top Performing Channels</h4>
+                    <ul>
+                        <li><strong>Social Media Posts</strong>: 68% (primary awareness driver)</li>
+                        <li><strong>In-stadium Signage/Screens</strong>: 36% (strong physical presence)</li>
+                        <li><strong>Team Merchandise</strong>: 34% (consistent visibility)</li>
+                        <li><strong>TV Ads</strong>: 26% (moderate impact)</li>
+                    </ul>
+                </div>
+                <div class="data-card">
+                    <h4><i class="fas fa-thumbs-down"></i> Underperforming Channels</h4>
+                    <ul>
+                        <li><strong>News Articles/Press Coverage</strong>: 1% (minimal effectiveness)</li>
+                        <li><strong>Game Broadcast Ads</strong>: 1% (minimal effectiveness)</li>
+                        <li><strong>Fan Forums/Discussion Groups</strong>: 1% (minimal effectiveness)</li>
+                        <li><strong>Other Online Websites</strong>: 5% (low impact)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <h5><i class="fas fa-bullhorn"></i> Channel Strategy Recommendation</h5>
+                <p>The data clearly indicates that social media and in-person touchpoints (stadium signage and merchandise) are the most effective channels for sponsorship awareness. Future campaigns should prioritize these channels while reconsidering the approach to news coverage, broadcast ads, and fan forums which have shown minimal effectiveness in the post-sponsorship period.</p>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2><i class="fas fa-lightbulb"></i> Key Insights & Recommendations</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="key-findings">Key Findings</button>
+                    <button class="tab-btn" data-tab="segment-strategy">Segment Strategy</button>
+                    <button class="tab-btn" data-tab="recommendations">Recommendations</button>
+                    <button class="tab-btn" data-tab="viewing-habits">Viewing Habits</button>
+                </div>
+                
+                <div class="tab-content active" id="key-findings-tab">
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-chart-line"></i> Major Success</h3>
+                        <p>The sponsorship has achieved significant success in creating awareness and association between Abu Dhabi and the NY Knicks. The notable increases in sponsorship awareness represent the most significant achievement of the campaign, creating a strong foundation for future marketing efforts.</p>
+                    </div>
+                    
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <h4><i class="fas fa-arrow-up"></i> Positive Outcomes</h4>
+                            <ul>
+                                <li><strong>Sponsorship Awareness</strong>: Increased from 74% to 82% among Knicks fans</li>
+                                <li><strong>Spontaneous Abu Dhabi Awareness</strong>: Significant increase from 0% to 22%</li>
+                                <li><strong>Total Abu Dhabi Awareness</strong>: Substantial growth from 4% to 46%</li>
+                                <li><strong>Digital Engagement</strong>: Strong follow-up actions after exposure</li>
+                            </ul>
+                        </div>
+                        <div class="data-card">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Areas for Improvement</h4>
+                            <ul>
+                                <li><strong>Website Visits</strong>: 32% (opportunity to increase engagement)</li>
+                                <li><strong>Word-of-Mouth</strong>: 13% (potential for growth)</li>
+                                <li><strong>Overseas Travel Interest</strong>: 30% (likelihood of traveling for pre-season matches)</li>
+                                <li><strong>Low-Performing Media Channels</strong>: 1-5% effectiveness (news, broadcasts, forums, websites)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- New Segment Strategy Tab -->
+                <div class="tab-content" id="segment-strategy-tab">
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-users"></i> Segment-Specific Approach</h3>
+                        <p>The significant differences in awareness and engagement metrics between fans and non-fans (9-14 percentage points) highlight the need for a dual-track marketing strategy that addresses the unique characteristics of each segment.</p>
+                    </div>
+                    
+                    <div class="segment-strategy-card fans-strategy-card">
+                        <h4><i class="fas fa-user-check"></i> Knicks Fans Strategy</h4>
+                        <p>Leverage the higher engagement and awareness levels among Knicks fans with deeper, basketball-focused content:</p>
+                        <ul>
+                            <li><strong>Channel Focus</strong>: Prioritize in-stadium activations (41% attendance) and sports bar promotions (51% viewership)</li>
+                            <li><strong>Content Strategy</strong>: Create basketball-themed Abu Dhabi experiences featuring favorite players (especially Jalen Brunson at 32% popularity)</li>
+                            <li><strong>Conversion Tactics</strong>: Develop exclusive travel packages with team connections and VIP opportunities</li>
+                            <li><strong>Digital Approach</strong>: Implement retargeting campaigns for the 32% who visited the website</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="segment-strategy-card non-fans-strategy-card">
+                        <h4><i class="fas fa-user-plus"></i> Non-Fans Strategy</h4>
+                        <p>Build broader awareness and interest among non-fans with more general destination marketing:</p>
+                        <ul>
+                            <li><strong>Channel Focus</strong>: Target home viewing experiences (84% watch at home) with TV ads during popular matches</li>
+                            <li><strong>Content Strategy</strong>: Highlight broader Abu Dhabi attractions beyond basketball connections</li>
+                            <li><strong>Conversion Tactics</strong>: Create travel promotions with broader appeal that don't require basketball fandom</li>
+                            <li><strong>Digital Approach</strong>: Leverage the similar digital consumption patterns (40% mobile/tablet usage) with general destination content</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="segment-opportunity-chart"></canvas>
+                    </div>
+                    
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-chart-bar"></i> Growth Potential Analysis</h3>
+                        <p>The Growth Potential values represent the remaining percentage that could be reached through targeted marketing efforts, calculated as follows:</p>
+                        <ul style="margin-top: 10px; margin-bottom: 10px; padding-left: 20px;">
+                            <li><strong>Destination Awareness</strong>: 39% (100% - 61% current awareness)</li>
+                            <li><strong>Advertising Awareness</strong>: 56% (100% - 44% current awareness)</li>
+                            <li><strong>Digital Engagement</strong>: 68% (100% - 32% website visit rate)</li>
+                            <li><strong>Travel Intent</strong>: 30% (based on overseas travel interest data)</li>
+                            <li><strong>Word-of-Mouth</strong>: 87% (100% - 13% current word-of-mouth rate)</li>
+                        </ul>
+                        <p>The Current Gap shows the existing percentage point difference between fans and non-fans, highlighting where segment-specific strategies can be most effective.</p>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h5><i class="fas fa-lightbulb"></i> Dual-Track Strategy Insight</h5>
+                        <p>A dual-track approach allows for both deepening engagement with fans while broadening appeal to non-fans. This maximizes the sponsorship's impact by leveraging the distinct viewing behaviors and preferences of each segment, optimizing marketing resources and creating more effective conversion pathways.</p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="recommendations-tab">
+                    <div class="recommendation-card">
+                        <h4><i class="fas fa-bullhorn"></i> Optimize Channel Strategy</h4>
+                        <p>Reallocate marketing resources based on channel effectiveness data:</p>
+                        <ul>
+                            <li>Increase investment in social media content and engagement</li>
+                            <li>Maintain strong in-stadium and merchandise presence</li>
+                            <li>Reconsider approach to news coverage, broadcast ads, and fan forums</li>
+                            <li>Develop more compelling website content to increase visits</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <h4><i class="fas fa-exchange-alt"></i> Enhance Conversion Strategies</h4>
+                        <p>Develop strategies to convert awareness into deeper engagement:</p>
+                        <ul>
+                            <li>Create specific calls-to-action to drive website traffic</li>
+                            <li>Develop incentives for fans to share Abu Dhabi content with friends/family</li>
+                            <li>Implement retargeting campaigns for those who have shown initial interest</li>
+                            <li>Create exclusive digital experiences for Knicks fans</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="recommendation-card">
+                        <h4><i class="fas fa-plane-departure"></i> Activate Travel Intent</h4>
+                        <p>Develop specific initiatives to convert awareness into travel behavior:</p>
+                        <ul>
+                            <li>Create travel packages featuring Knicks-themed experiences in Abu Dhabi</li>
+                            <li>Partner with travel agencies to offer exclusive deals for Knicks fans</li>
+                            <li>Develop content highlighting Abu Dhabi attractions that appeal to basketball fans</li>
+                            <li>Consider pre-season games or player appearances in Abu Dhabi</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="viewing-habits-tab">
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-tv"></i> Basketball Viewing Habits</h3>
+                        <p>Understanding how Knicks fans consume basketball content provides valuable insights for future sponsorship activations and content strategy.</p>
+                    </div>
+                    
+                    <div class="data-grid">
+                        <div class="data-card">
+                            <h4><i class="fas fa-clock"></i> Viewing Frequency</h4>
+                            <ul>
+                                <li><strong>Daily Viewers</strong>: 16% of Knicks fans (vs. 10% non-fans)</li>
+                                <li><strong>4-5 Times Weekly</strong>: 30% of Knicks fans</li>
+                                <li><strong>2-3 Times Weekly</strong>: 38% of Knicks fans</li>
+                                <li><strong>Once Weekly or Less</strong>: 16% of Knicks fans</li>
+                            </ul>
+                        </div>
+                        <div class="data-card">
+                            <h4><i class="fas fa-map-marker-alt"></i> Viewing Locations</h4>
+                            <ul>
+                                <li><strong>TV at Home/Friend's Place</strong>: 87% of Knicks fans</li>
+                                <li><strong>Sports Bar/Cafe</strong>: 51% of Knicks fans</li>
+                                <li><strong>In-Stadium (Live)</strong>: 41% of Knicks fans</li>
+                                <li><strong>Mobile/Laptop/Tablet</strong>: 41% of Knicks fans</li>
+                            </ul>
+                        </div>
+                        <div class="data-card">
+                            <h4><i class="fas fa-user"></i> Favorite Players</h4>
+                            <ul>
+                                <li><strong>Jalen Brunson</strong>: 32% (top player)</li>
+                                <li><strong>Karl Antony Towns</strong>: 10%</li>
+                                <li><strong>Julius Randle</strong>: 9%</li>
+                                <li><strong>Mikal Bridges & Mitchell Robinson</strong>: 7% each</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h5><i class="fas fa-lightbulb"></i> Viewing Habits Insight</h5>
+                        <p>The high percentage of Knicks fans watching games in-stadium (41%) and at sports bars (51%) presents an opportunity for physical brand activations. Additionally, the strong preference for Jalen Brunson (32%) suggests potential value in featuring him in Abu Dhabi promotional content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="print-btn" title="Print Dashboard"><i class="fas fa-print"></i></button>
+    
+    <footer style="background-color: var(--gray-100); padding: 20px 0; text-align: center; margin-top: 40px; border-top: 1px solid var(--gray-300);">
+        <div class="container">
+            <p style="margin: 0; color: var(--gray-700); font-size: 0.9rem;">© 2025 Research & Insights Unit | Strategic Marketing & Communications | Department of Culture and Tourism – Abu Dhabi</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Find the parent tab container
+                const tabContainer = button.closest('.tab-container');
+                
+                // Update active button within this container only
+                tabContainer.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                
+                // Update active content within this container only
+                tabContainer.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Print functionality
+        document.querySelector('.print-btn').addEventListener('click', () => {
+            window.print();
+        });
+        
+        // Chart.js implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all tab containers to show their first tab by default
+            document.querySelectorAll('.tab-container').forEach(container => {
+                // Get the first tab button in this container
+                const firstTabBtn = container.querySelector('.tab-btn');
+                if (firstTabBtn) {
+                    // Simulate a click on the first tab button
+                    firstTabBtn.click();
+                }
+            });
+            
+            // Set global Chart.js options
+            Chart.defaults.color = '#e0e0e0';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            
+            // Channels Chart - Horizontal bar chart for better readability
+            const channelsCtx = document.getElementById('channels-chart').getContext('2d');
+            
+            // Sort data in descending order
+            const channelsData = [
+                { label: 'Social Media', value: 68 },
+                { label: 'In-stadium Signage', value: 36 },
+                { label: 'Team Merchandise', value: 34 },
+                { label: 'TV Ads', value: 26 },
+                { label: 'Family/Friends', value: 19 },
+                { label: 'EAD Website', value: 15 },
+                { label: 'Other Websites', value: 5 },
+                { label: 'News/Press', value: 1 },
+                { label: 'Broadcast Ads', value: 1 },
+                { label: 'Fan Forums', value: 1 }
+            ].sort((a, b) => b.value - a.value);
+            
+            const channelsChart = new Chart(channelsCtx, {
+                type: 'bar',
+                data: {
+                    labels: channelsData.map(item => item.label),
+                    datasets: [{
+                        label: 'Effectiveness (%)',
+                        data: channelsData.map(item => item.value),
+                        backgroundColor: 'rgba(245, 132, 38, 0.8)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Post-Sponsorship Awareness Channels',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            display: false // Hide legend as it's redundant
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Awareness Chart
+            const awarenessCtx = document.getElementById('awareness-chart').getContext('2d');
+            const awarenessChart = new Chart(awarenessCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Overall Knicks Sponsorship Awareness', 'Spontaneous Abu Dhabi Awareness', 'Total Abu Dhabi Awareness', 'Destination Awareness (Knicks Fans)'],
+                    datasets: [{
+                        label: 'Pre-Sponsorship',
+                        data: [74, 0, 4, 58],
+                        backgroundColor: 'rgba(0, 107, 182, 0.7)',
+                        borderColor: 'rgba(0, 107, 182, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Post-Sponsorship',
+                        data: [82, 22, 46, 61],
+                        backgroundColor: 'rgba(245, 132, 38, 0.7)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Awareness Metrics Comparison',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Advertising Chart
+            const advertisingCtx = document.getElementById('advertising-chart').getContext('2d');
+            const advertisingChart = new Chart(advertisingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Overall Advertising Awareness', 'TOM (MENA destinations)', 'Spontaneous (MENA destinations)'],
+                    datasets: [{
+                        label: 'Pre-Sponsorship',
+                        data: [37, 1, 2],
+                        backgroundColor: 'rgba(0, 107, 182, 0.7)',
+                        borderColor: 'rgba(0, 107, 182, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Post-Sponsorship',
+                        data: [44, 4, 8],
+                        backgroundColor: 'rgba(245, 132, 38, 0.7)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Advertising Awareness Among Knicks Fans',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Engagement Chart - Post-sponsorship only
+            const engagementCtx = document.getElementById('engagement-chart').getContext('2d');
+            
+            // Sort data in descending order
+            const engagementData = [
+                { label: 'Googled Abu Dhabi', value: 62 },
+                { label: 'Browsed Social Media', value: 51 },
+                { label: 'Visited Website', value: 32 },
+                { label: 'Asked Friends/Family', value: 13 }
+            ].sort((a, b) => b.value - a.value);
+            
+            const engagementChart = new Chart(engagementCtx, {
+                type: 'bar',
+                data: {
+                    labels: engagementData.map(item => item.label),
+                    datasets: [{
+                        data: engagementData.map(item => item.value),
+                        backgroundColor: 'rgba(245, 132, 38, 0.8)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Current Engagement Actions After Exposure',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            display: false // Hide legend as it's redundant
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: false
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#fff',
+                            font: {
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Fans vs. Non-Fans Awareness Comparison Chart
+            const awarenessComparisonCtx = document.getElementById('awareness-comparison-chart').getContext('2d');
+            const awarenessComparisonChart = new Chart(awarenessComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Overall Destination Awareness', 'Spontaneous Awareness (MENA)', 'Top of Mind (MENA)', 'Overall Advertising Awareness', 'Spontaneous Ad Awareness (MENA)'],
+                    datasets: [{
+                        label: 'NY Knicks Fans',
+                        data: [61, 13, 5, 44, 8],
+                        backgroundColor: 'rgba(245, 132, 38, 0.7)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Non-Fans',
+                        data: [52, 4, 3, 30, 4],
+                        backgroundColor: 'rgba(0, 107, 182, 0.7)',
+                        borderColor: 'rgba(0, 107, 182, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Awareness Metrics: Fans vs. Non-Fans',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            callbacks: {
+                                afterBody: function(context) {
+                                    const index = context[0].dataIndex;
+                                    const fans = context[0].dataset.data[index];
+                                    const nonFans = context[1] ? context[1].dataset.data[index] : context[0].dataset.data[index];
+                                    const diff = fans - nonFans;
+                                    return `Difference: ${diff > 0 ? '+' : ''}${diff}pp`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Viewing Radar Chart
+            const viewingRadarCtx = document.getElementById('viewing-radar-chart').getContext('2d');
+            const viewingRadarChart = new Chart(viewingRadarCtx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'Watch Regardless of Teams',
+                        'Daily Viewing',
+                        'In-Stadium Viewing',
+                        'Sports Bar Viewing',
+                        'Home TV Viewing',
+                        'Mobile/Digital Viewing'
+                    ],
+                    datasets: [{
+                        label: 'NY Knicks Fans',
+                        data: [37, 16, 41, 51, 87, 41],
+                        backgroundColor: 'rgba(245, 132, 38, 0.2)',
+                        borderColor: 'rgba(245, 132, 38, 0.8)',
+                        pointBackgroundColor: 'rgba(245, 132, 38, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(245, 132, 38, 1)'
+                    }, {
+                        label: 'Non-Fans',
+                        data: [27, 10, 34, 44, 84, 40],
+                        backgroundColor: 'rgba(0, 107, 182, 0.2)',
+                        borderColor: 'rgba(0, 107, 182, 0.8)',
+                        pointBackgroundColor: 'rgba(0, 107, 182, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(0, 107, 182, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Viewing Behavior Comparison',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 30
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                z: 100
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Engagement Chart - Showing independent touchpoints after learning about sponsorship
+            const engagementJourneyCtx = document.getElementById('engagement-journey-chart').getContext('2d');
+            
+            // Create a horizontal bar chart showing independent engagement touchpoints
+            const engagementJourneyChart = new Chart(engagementJourneyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Googled Abu Dhabi', 'Browsed Abu Dhabi on Social Media', 'Visited Experience Abu Dhabi Website', 'Asked Friends/Family About Abu Dhabi'],
+                    datasets: [{
+                        label: 'Engagement Rate',
+                        data: [62, 51, 32, 13],
+                        backgroundColor: 'rgba(245, 132, 38, 0.8)',
+                        borderColor: 'rgba(245, 132, 38, 1)',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',  // Horizontal bars
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Engagement with Abu Dhabi/EAD after learning about the sponsorship',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        },
+                        subtitle: {
+                            display: true,
+                            text: 'Base: All who are aware of Abu Dhabi sponsoring NY Knicks',
+                            font: {
+                                size: 12,
+                                style: 'italic'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.parsed.x}% of fans engaged in this way`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Segment Opportunity Chart - Improved version with clearer visualization
+            const segmentOpportunityCtx = document.getElementById('segment-opportunity-chart').getContext('2d');
+            
+            // Create a horizontal bar chart for better readability of multiple metrics
+            const segmentOpportunityChart = new Chart(segmentOpportunityCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Destination Awareness', 'Advertising Awareness', 'Digital Engagement', 'Travel Intent', 'Word-of-Mouth'],
+                    datasets: [
+                        {
+                            label: 'Current Fan Metrics (%)',
+                            data: [61, 44, 32, 30, 13],
+                            backgroundColor: 'rgba(245, 132, 38, 0.7)',
+                            borderColor: 'rgba(245, 132, 38, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            order: 1
+                        },
+                        {
+                            label: 'Growth Potential (%)',
+                            data: [39, 56, 68, 70, 87],
+                            backgroundColor: 'rgba(0, 107, 182, 0.7)',
+                            borderColor: 'rgba(0, 107, 182, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            order: 2
+                        },
+                        {
+                            label: 'Fan vs Non-Fan Gap (pp)',
+                            data: [9, 14, 1, 0, 0],
+                            backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                            order: 3
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bars for better comparison
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Segment Opportunity Analysis',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 10
+                            }
+                        },
+                        subtitle: {
+                            display: true,
+                            text: 'Current metrics vs remaining growth potential and fan/non-fan gaps',
+                            font: {
+                                size: 12,
+                                style: 'italic'
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                boxWidth: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            padding: 15,
+                            caretSize: 8,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    
+                                    if (context.parsed.x !== null) {
+                                        const value = context.parsed.x;
+                                        if (context.dataset.label.includes('Gap')) {
+                                            label += value + ' percentage points';
+                                        } else {
+                                            label += value + '%';
+                                        }
+                                    }
+                                    
+                                    return label;
+                                },
+                                afterBody: function(context) {
+                                    const metric = context[0].label;
+                                    let explanation = '';
+                                    
+                                    switch(metric) {
+                                        case 'Destination Awareness':
+                                            explanation = 'Current: 61% of fans aware\nGrowth: 39% potential new awareness\nGap: 9pp higher among fans vs non-fans';
+                                            break;
+                                        case 'Advertising Awareness':
+                                            explanation = 'Current: 44% of fans aware\nGrowth: 56% potential new awareness\nGap: 14pp higher among fans vs non-fans';
+                                            break;
+                                        case 'Digital Engagement':
+                                            explanation = 'Current: 32% website visit rate\nGrowth: 68% potential new engagement\nGap: 1pp higher among fans vs non-fans';
+                                            break;
+                                        case 'Travel Intent':
+                                            explanation = 'Current: 30% overseas travel interest\nGrowth: 70% potential new interest\nGap: Similar between fans and non-fans';
+                                            break;
+                                        case 'Word-of-Mouth':
+                                            explanation = 'Current: 13% word-of-mouth rate\nGrowth: 87% potential new advocacy\nGap: Similar between fans and non-fans';
+                                            break;
+                                    }
+                                    
+                                    return explanation;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
