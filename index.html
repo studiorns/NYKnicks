@@ -9,6 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Hide tooltip elements as they're not being used */
+        .tooltip-overlay, .tooltip, .tooltip-close {
+            display: none !important;
+        }
+        
         /* SONER Logo Animation */
         @keyframes sonerScan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes sonerBlip { 0%, 20%, 100% { opacity: 0; } 2%, 15% { opacity: 1; } 3% { transform: scale(1.2); } }
@@ -237,6 +242,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
         
         .data-card:hover {
@@ -257,6 +263,26 @@
         .data-card h4 i {
             margin-right: 10px;
             color: var(--primary);
+        }
+        
+        /* List styling to keep items inside cards */
+        .data-card ul {
+            list-style-position: inside;
+            padding-left: 0;
+            margin-bottom: 0;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+        
+        .data-card li {
+            margin-bottom: 10px;
+            padding-left: 5px;
+            text-indent: -5px;
+        }
+        
+        .data-card li:last-child {
+            margin-bottom: 0;
         }
         
         /* Insight Summary */
@@ -601,11 +627,17 @@
         
         .strategy-card ul {
             margin-left: 20px;
+            list-style-position: inside;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         
         .strategy-card li {
             margin-bottom: 10px;
             line-height: 1.5;
+            padding-left: 5px;
+            text-indent: -5px;
         }
         
         .strategy-card li:last-child {
@@ -649,6 +681,17 @@
             .data-card {
                 padding: 16px;
                 margin-bottom: 16px;
+            }
+            
+            .data-card ul {
+                padding-left: 0;
+            }
+            
+            .data-card li {
+                padding-left: 3px;
+                text-indent: -3px;
+                font-size: 0.95rem;
+                line-height: 1.4;
             }
             
             .data-card h4 {
@@ -703,6 +746,18 @@
                 font-size: 1.15rem;
                 margin-bottom: 10px;
             }
+            
+            .strategy-card ul {
+                margin-left: 10px;
+                padding-left: 0;
+            }
+            
+            .strategy-card li {
+                padding-left: 3px;
+                text-indent: -3px;
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
         }
         
         /* Additional styles for even smaller screens */
@@ -722,6 +777,18 @@
             
             .data-card h4 {
                 font-size: 1rem;
+            }
+            
+            .data-card ul {
+                padding-left: 0;
+            }
+            
+            .data-card li {
+                padding-left: 2px;
+                text-indent: -2px;
+                font-size: 0.9rem;
+                line-height: 1.3;
+                margin-bottom: 8px;
             }
             
             .metric-name {
@@ -756,6 +823,18 @@
             .insight-summary p {
                 font-size: 0.95rem;
                 line-height: 1.5;
+            }
+            
+            .strategy-card ul {
+                margin-left: 5px;
+            }
+            
+            .strategy-card li {
+                padding-left: 2px;
+                text-indent: -2px;
+                font-size: 0.9rem;
+                line-height: 1.3;
+                margin-bottom: 8px;
             }
         }
     </style>
