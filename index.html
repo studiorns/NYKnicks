@@ -837,6 +837,40 @@
                 margin-bottom: 8px;
             }
         }
+        
+        /* Footer Styles */
+        .footer {
+            background-color: var(--gray-100);
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid var(--gray-300);
+            margin-top: 40px;
+            width: 100%;
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+        
+        .footer p {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .footer {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1654,6 +1688,11 @@
                     <i class="fas fa-arrow-up"></i>
                 </button>
             </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2025 Research &amp; Insights Unit | Strategic Marketing &amp; Communications | Department of Culture and Tourism – Abu Dhabi</p>
+            </div>
         </main>
     </div>
     
@@ -1663,6 +1702,7 @@
         <div class="tooltip-close" id="tooltipClose"><i class="fas fa-times"></i></div>
         <div id="tooltipContent"></div>
     </div>
+    
 
     <script>
         // Active navigation link highlighting
