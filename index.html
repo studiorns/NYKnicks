@@ -281,6 +281,28 @@
             margin-right: 10px;
         }
         
+        /* Strategy Summary - Blue styling for strategy sections */
+        .strategy-summary {
+            background-color: var(--secondary-light);
+            border-left: 4px solid var(--secondary);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            position: relative;
+        }
+        
+        .strategy-summary h3 {
+            color: var(--secondary-dark);
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .strategy-summary h3 i {
+            margin-right: 10px;
+        }
+        
         /* Executive Summary */
         .executive-summary {
             background: linear-gradient(135deg, var(--primary-light), var(--secondary-light));
@@ -519,6 +541,77 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* Touchpoint Strategy Styles */
+        .touchpoint-category {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-300);
+        }
+        
+        .touchpoint-category h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .touchpoint-category h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .touchpoint-data {
+            background-color: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 8px 15px;
+            margin-bottom: 15px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .touchpoint-data span {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .strategy-card {
+            background-color: var(--secondary-light);
+            border-left: 3px solid var(--secondary);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        
+        .strategy-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .strategy-card h4 {
+            color: var(--secondary-dark);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+        
+        .strategy-card ul {
+            margin-left: 20px;
+        }
+        
+        .strategy-card li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .strategy-card li:last-child {
+            margin-bottom: 0;
+        }
+        
         /* Responsive Styles */
         @media (max-width: 768px) {
             .sidebar {
@@ -716,6 +809,11 @@
                             <i class="fas fa-lightbulb"></i> Insights & Recommendations
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#touchpoint-strategies" class="nav-link">
+                            <i class="fas fa-bullseye"></i> Touchpoint Strategies
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>
@@ -870,7 +968,7 @@
                         </div>
                     </div>
                     
-                    <div class="insight-summary">
+                    <div class="strategy-summary">
                         <h3><i class="fas fa-bullseye"></i> Fan Engagement Strategy</h3>
                         <p><strong>Four key strategic priorities for maximizing sponsorship ROI:</strong></p>
                         <ol>
@@ -1111,7 +1209,7 @@
                         </div>
                     </div>
                     
-                    <div class="insight-summary">
+                    <div class="strategy-summary">
                         <h3><i class="fas fa-bullseye"></i> Optimization Opportunities</h3>
                         <p><strong>Word-of-Mouth Activation:</strong> The gap between fans who learn about the sponsorship through word-of-mouth (19%) and those who generate new conversations (13%) highlights an opportunity to transform passive awareness into active advocacy. By creating content that resonates with the 41% of fans who attend games in-stadium and the 51% who watch at sports bars, Abu Dhabi can inspire more organic conversations.</p>
                         <p><strong>Digital-to-Physical Conversion:</strong> The significant difference between digital discovery (62% Google searches) and word-of-mouth sharing (13%) indicates that fans are researching but not discussing Abu Dhabi. Connecting digital engagement to the 30% of fans expressing travel interest could create natural conversation triggers, particularly among the 32% who already visit the Experience Abu Dhabi website.</p>
@@ -1194,7 +1292,7 @@
                     </div>
                     
                     <!-- Strategic Implications -->
-                    <div class="insight-summary">
+                    <div class="strategy-summary">
                         <h3><i class="fas fa-bullseye"></i> Non-Fan Engagement Strategy</h3>
                         <p>The data reveals significant opportunities to build on the existing awareness among non-fans. With 52% overall awareness already established, future campaigns could focus on converting this baseline awareness into deeper engagement. The substantial digital consumption (40% using mobile/laptop/tablet) suggests that digital channels could be particularly effective for reaching this broader audience with content that resonates beyond basketball-specific themes.</p>
                     </div>
@@ -1223,7 +1321,8 @@
                         <p><strong>Engagement Opportunity</strong>: The sponsorship is successfully driving curiosity and digital exploration, with opportunity to further convert this interest into deeper engagement and advocacy.</p>
                     </div>
                     
-                    <h3 style="margin-top: 30px; margin-bottom: 20px;"><i class="fas fa-chess"></i> Strategic Recommendations</h3>
+                    <h3 style="margin-top: 30px; margin-bottom: 20px;"><i class="fas fa-chess"></i> Cross-Channel Strategic Initiatives</h3>
+                    <p style="margin-bottom: 20px;">These cross-channel initiatives represent our primary strategic focus areas that integrate multiple touchpoints for a cohesive approach to the sponsorship.</p>
                     
                     <div class="grid-2">
                         <div class="data-card">
@@ -1267,11 +1366,207 @@
                         </div>
                     </div>
                     
-                    <div class="insight-summary">
+                    <div class="strategy-summary">
                         <h3><i class="fas fa-lightbulb"></i> Strategic Implementation Priorities</h3>
                         <p><strong>Short-Term Focus</strong>: Enhance social media content strategy and in-stadium activations to capitalize on the strongest awareness channels.</p>
                         <p><strong>Medium-Term Development</strong>: Launch the merchandise innovation program and second-screen experience to deepen engagement with the most active fan segments.</p>
                         <p><strong>Long-Term Vision</strong>: Create a year-round content calendar aligned with basketball seasons and events, develop loyalty programs that reward continued engagement with Abu Dhabi content, and establish Abu Dhabi as an authentic part of the Knicks fan experience.</p>
+                    </div>
+                </section>
+                
+                <!-- Touchpoint Strategies Section -->
+                <section id="touchpoint-strategies" class="section">
+                    <div class="section-header">
+                        <h2 class="section-title"><i class="fas fa-bullseye"></i> Touchpoint-Specific Strategies</h2>
+                    </div>
+                    
+                    <div class="insight-summary">
+                        <h3><i class="fas fa-lightbulb"></i> Optimizing Each Engagement Touchpoint</h3>
+                        <p>The data reveals distinct engagement patterns across different touchpoints. Rather than viewing these as a linear funnel, each touchpoint represents a unique opportunity to engage fans with Abu Dhabi. The following touchpoint-specific strategies provide detailed tactical recommendations for optimizing each individual channel based on the data.</p>
+                    </div>
+                    
+                    <!-- Digital Touchpoints -->
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-search"></i> Search Touchpoint</h3>
+                        <div class="touchpoint-data"><span>62%</span> of aware fans actively searched for Abu Dhabi information</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Keyword Optimization:</strong> Develop content targeting basketball-specific search terms based on the 62% search behavior</li>
+                                <li><strong>Search Ad Investment:</strong> Allocate dedicated budget for search ads targeting the specific terms fans are using</li>
+                                <li><strong>Basketball-Themed Landing Pages:</strong> Create dedicated landing pages that speak directly to basketball fans' interests</li>
+                                <li><strong>Search Result Enhancement:</strong> Implement rich snippets and enhanced search results to stand out in search results</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-hashtag"></i> Social Media Touchpoint</h3>
+                        <div class="touchpoint-data"><span>51%</span> engaged with Abu Dhabi content on social platforms</div>
+                        <div class="touchpoint-data"><span>68%</span> became aware through social media posts</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Platform-Specific Strategy:</strong> Tailor content to each platform based on the 51% engagement data</li>
+                                <li><strong>Content Calendar Alignment:</strong> Sync content with the game schedule data (46% watch 4+ times weekly)</li>
+                                <li><strong>Player Partnership:</strong> Feature Jalen Brunson (32% fan favorite) prominently in social content</li>
+                                <li><strong>Interactive Content Series:</strong> Develop Abu Dhabi trivia, polls, and interactive elements that stand alone as engaging content</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-globe"></i> Website Touchpoint</h3>
+                        <div class="touchpoint-data"><span>32%</span> visited the Experience Abu Dhabi website</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Basketball Fan Hub:</strong> Create a dedicated section for the 32% of basketball fans who visit</li>
+                                <li><strong>Digital Experience Enhancement:</strong> Develop virtual tours and interactive experiences of Abu Dhabi</li>
+                                <li><strong>Travel Planning Tools:</strong> Implement specialized planning resources for the 30% expressing travel interest</li>
+                                <li><strong>Content Personalization:</strong> Tailor website content based on visitor source and interests</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-comments"></i> Word-of-Mouth Touchpoint</h3>
+                        <div class="touchpoint-data"><span>13%</span> discussed Abu Dhabi with friends and family</div>
+                        <div class="touchpoint-data"><span>19%</span> learned about the sponsorship through word-of-mouth</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Conversation-Worthy Content:</strong> Create surprising or unexpected content about Abu Dhabi that naturally prompts discussion</li>
+                                <li><strong>Shareable Facts Campaign:</strong> Develop "Did you know?" series about Abu Dhabi that's easy to repeat in conversation</li>
+                                <li><strong>Fan Story Showcase:</strong> Feature stories from fans who have visited Abu Dhabi to inspire similar conversations</li>
+                                <li><strong>Cultural Connection Points:</strong> Highlight similarities and interesting differences between NYC and Abu Dhabi</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Physical Touchpoints -->
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-map-marker-alt"></i> In-Stadium Touchpoint</h3>
+                        <div class="touchpoint-data"><span>41%</span> of Knicks fans attend games in-person</div>
+                        <div class="touchpoint-data"><span>36%</span> became aware through in-stadium signage/screens</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Immersive Installations:</strong> Create Abu Dhabi-themed areas within the stadium for the 41% attending in person</li>
+                                <li><strong>Exclusive In-Stadium Content:</strong> Develop content and experiences only available to in-stadium attendees</li>
+                                <li><strong>Branded Giveaways:</strong> Design high-quality Abu Dhabi branded items specifically for in-stadium distribution</li>
+                                <li><strong>VIP Experiences:</strong> Create premium Abu Dhabi-themed experiences for season ticket holders</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-beer"></i> Sports Bar Touchpoint</h3>
+                        <div class="touchpoint-data"><span>51%</span> of Knicks fans watch at sports bars/cafes</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Bar Partnership Program:</strong> Develop official Abu Dhabi viewing locations at popular sports bars</li>
+                                <li><strong>Themed Viewing Experiences:</strong> Create Abu Dhabi-themed food and drink specials for game nights</li>
+                                <li><strong>Bar-Specific Contests:</strong> Implement location-based promotions exclusive to sports bar viewers</li>
+                                <li><strong>Ambient Branding:</strong> Design subtle but effective branded elements for sports bar environments</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-home"></i> Home Viewing Touchpoint</h3>
+                        <div class="touchpoint-data"><span>87%</span> of Knicks fans watch at home</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Broadcast Integration:</strong> Develop Abu Dhabi content segments that enhance the at-home viewing experience</li>
+                                <li><strong>Second-Screen Content:</strong> Create companion content specifically designed for dual-screen home viewing</li>
+                                <li><strong>Family-Oriented Messaging:</strong> Design content that appeals to multi-generational home viewing situations</li>
+                                <li><strong>TV Ad Optimization:</strong> Develop ads specifically designed for the home viewing context</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-mobile-alt"></i> Mobile/Digital Viewing Touchpoint</h3>
+                        <div class="touchpoint-data"><span>41%</span> of Knicks fans consume content on mobile/laptop/tablet</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Mobile-First Content:</strong> Design vertical video and mobile-optimized experiences as standalone content</li>
+                                <li><strong>App Integration:</strong> Partner with popular basketball apps to create Abu Dhabi-themed features</li>
+                                <li><strong>Second-Screen Experiences:</strong> Develop companion content specifically for mobile consumption during games</li>
+                                <li><strong>Interactive Mobile Experiences:</strong> Create gamified mobile experiences related to Abu Dhabi</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Merchandise Touchpoint -->
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-tshirt"></i> Merchandise Touchpoint</h3>
+                        <div class="touchpoint-data"><span>34%</span> became aware through team merchandise</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Limited-Edition Co-Branded Items:</strong> Develop exclusive Abu Dhabi × NY Knicks merchandise</li>
+                                <li><strong>Collectible Series:</strong> Create collectible items featuring Knicks players at iconic Abu Dhabi landmarks</li>
+                                <li><strong>Premium Travel Accessories:</strong> Design basketball-themed travel items connecting fandom with Abu Dhabi</li>
+                                <li><strong>QR-Enhanced Products:</strong> Implement QR codes on merchandise that unlock exclusive Abu Dhabi content</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Segment-Specific Touchpoints -->
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-clock"></i> High-Frequency Viewers Touchpoint</h3>
+                        <div class="touchpoint-data"><span>46%</span> of fans watch basketball 4+ times weekly</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Serialized Content:</strong> Develop multi-part content that rewards regular viewing</li>
+                                <li><strong>Frequency-Based Rewards:</strong> Create programs that recognize and reward consistent engagement</li>
+                                <li><strong>Insider Content:</strong> Provide exclusive "behind the scenes" Abu Dhabi content for frequent viewers</li>
+                                <li><strong>Progressive Storytelling:</strong> Implement narratives that unfold over multiple games</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="touchpoint-category">
+                        <h3><i class="fas fa-plane-departure"></i> Travel-Interested Fans Touchpoint</h3>
+                        <div class="touchpoint-data"><span>30%</span> express likelihood to travel overseas for pre-season matches</div>
+                        
+                        <div class="strategy-card">
+                            <h4>Strategic Recommendations</h4>
+                            <ul>
+                                <li><strong>Dedicated Travel Portal:</strong> Create a specialized booking platform for basketball fans</li>
+                                <li><strong>Basketball-Themed Packages:</strong> Develop travel experiences centered around basketball in Abu Dhabi</li>
+                                <li><strong>Exclusive Fan Experiences:</strong> Design travel packages with unique basketball-related activities</li>
+                                <li><strong>Pre-Season Match Packages:</strong> Create all-inclusive experiences around potential pre-season games</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="strategy-summary">
+                        <h3><i class="fas fa-chart-line"></i> Implementation Approach</h3>
+                        <p>Rather than prioritizing touchpoints in a sequence, we recommend a parallel implementation approach that treats each touchpoint as its own strategic initiative:</p>
+                        <ol>
+                            <li><strong>Audit Current Performance:</strong> Evaluate the effectiveness of each touchpoint independently</li>
+                            <li><strong>Set Touchpoint-Specific KPIs:</strong> Establish success metrics for each touchpoint based on its unique characteristics</li>
+                            <li><strong>Allocate Dedicated Resources:</strong> Assign specialized teams or agency partners to each touchpoint</li>
+                            <li><strong>Implement Continuous Optimization:</strong> Establish ongoing measurement and refinement for each touchpoint</li>
+                        </ol>
+                        <p>This approach ensures each touchpoint receives focused attention and optimization based on its unique characteristics and audience engagement patterns, rather than being viewed primarily as a step in a conversion process.</p>
                     </div>
                 </section>
                 
